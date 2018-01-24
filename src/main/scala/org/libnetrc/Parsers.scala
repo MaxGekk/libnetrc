@@ -11,15 +11,16 @@ trait Parsers extends RegexParsers with JavaTokenParsers {
   def machineValue = value
   def loginValue = value
   def passwordValue = value
+  def accountPassword = value
 
   def machine: Parser[Machine] = positioned {
-    "machine" ~>  machineValue ~ "login" ~ loginValue ~ "password" ~ passwordValue ^^ {
-    case (machineName ~ _ ~ loginName ~ _ ~ password) => Machine(machineName, loginName, password)
+    "machine" ~>  machineValue ~ "login" ~ loginValue ~ "password" ~ passwordValue ~ (("account" ~> accountPassword)?) ^^ {
+    case (machineName ~ _ ~ loginName ~ _ ~ password ~ account) => Machine(machineName, loginName, password, account)
   }}
 
   def default: Parser[Default] = positioned {
-    "default" ~>  "login" ~ loginValue ~ "password" ~ passwordValue ^^ {
-      case (_ ~ loginName ~ _ ~ password) => Default(loginName, password)
+    "default" ~>  "login" ~ loginValue ~ "password" ~ passwordValue ~ (("account" ~> accountPassword)?)  ^^ {
+      case (_ ~ loginName ~ _ ~ password ~ account) => Default(loginName, password, account)
   }}
 
   def item: Parser[Item] = positioned(machine | default | "" ~> failure("expected items: machine"))
