@@ -10,5 +10,6 @@ case class Machine(name: String,
 case class Default(login: String,
                    password: String,
                    account: Option[String] = None) extends Item
+case class MacDef(name: String, commands: String) extends Item
 
 case class NetRc(items: Seq[Item])

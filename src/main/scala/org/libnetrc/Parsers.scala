@@ -23,7 +23,15 @@ trait Parsers extends RegexParsers with JavaTokenParsers {
       case (_ ~ loginName ~ _ ~ password ~ account) => Default(loginName, password, account)
   }}
 
-  def item: Parser[Item] = positioned(machine | default | "" ~> failure("expected items: machine"))
+  def macDefName = value
+
+  def macdef: Parser[MacDef] = positioned {
+    "macdef" ~> failure("macdef is not supported")
+  }
+
+  def item: Parser[Item] = positioned(machine | default | macdef |
+    "" ~> failure("expected items: machine"))
+
   // Netrc is just repeated items
   def netrc = rep(item) ^^ {NetRc(_)}
 }

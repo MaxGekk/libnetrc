@@ -106,5 +106,15 @@ class ParserTests extends FlatSpec with Matchers {
       Default("root@mail.com", "hello123", Some("acc456"))
     )))
   }
+
+  it should "parse macdef" in {
+    val macdef =
+      s"""
+         | macdef init
+         | cp a.txt b.txt
+         |
+       """.stripMargin
+    Parsers.parse(macdef).isLeft shouldBe true
+  }
 }
 
