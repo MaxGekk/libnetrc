@@ -5,19 +5,20 @@ import scala.util.parsing.input.CharSequenceReader
 
 // Parser-combinators for the .netrc syntax
 trait Parsers extends RegexParsers with JavaTokenParsers {
-  def name = "" ~> // handle whitespace
-    rep1(elem("name part", Character.isLetterOrDigit(_: Char))) ^^ (_.mkString)
+  def value = "" ~> // handle whitespace
+    rep1(elem("name part", !Character.isSpace(_: Char))) ^^ (_.mkString)
 
-  def str = "" ~> // handle whitespace
-    rep1(elem("name part", Character.isLetterOrDigit(_: Char))) ^^ (_.mkString)
+  def machineValue = value
+  def loginValue = value
+  def passwordValue = value
 
   def machine: Parser[Machine] = positioned {
-    "machine" ~>  name ~ "login" ~ name ~ "password" ~ str ^^ {
+    "machine" ~>  machineValue ~ "login" ~ loginValue ~ "password" ~ passwordValue ^^ {
     case (machineName ~ _ ~ loginName ~ _ ~ password) => Machine(machineName, loginName, password)
   }}
 
   def default: Parser[Default] = positioned {
-    "default" ~>  "login" ~ name ~ "password" ~ str ^^ {
+    "default" ~>  "login" ~ loginValue ~ "password" ~ passwordValue ^^ {
       case (_ ~ loginName ~ _ ~ password) => Default(loginName, password)
   }}
 
