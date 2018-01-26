@@ -1,5 +1,9 @@
 package org.libnetrc
 
+import java.io._
+import java.nio.CharBuffer
+
+import scala.io.Source
 import scala.util.parsing.input.Positional
 
 sealed trait Item extends Positional
@@ -31,5 +35,24 @@ case class MacDef(name: String, commands: String) extends Item {
 case class NetRc(items: Seq[Item]) {
   override def toString: String = {
     items.map(_.toString).mkString("\n")
+  }
+
+  def save(file: String, append: Boolean = false): Unit = {
+    val fw = new FileWriter(file)
+    try {
+      fw.write(toString)
+    } finally {
+      fw.close()
+    }
+  }
+}
+
+object NetRcFile {
+  def read(file: String): NetRc = {
+    val str = Source.fromFile(file).mkString
+    Parsers.parse(str) match {
+      case Left(error) => throw error
+      case Right(netc) => netc
+    }
   }
 }
