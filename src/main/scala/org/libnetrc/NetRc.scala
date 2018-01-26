@@ -1,8 +1,6 @@
 package org.libnetrc
 
 import java.io._
-import java.nio.CharBuffer
-
 import scala.io.Source
 import scala.util.parsing.input.Positional
 
@@ -45,6 +43,8 @@ case class NetRc(items: Seq[Item]) {
       fw.close()
     }
   }
+
+  def save(append: Boolean): Unit = save(NetRcFile.name, append)
 }
 
 object NetRcFile {
@@ -54,5 +54,15 @@ object NetRcFile {
       case Left(error) => throw error
       case Right(netc) => netc
     }
+  }
+
+  def read: NetRc = read(name)
+
+  def name = {
+    val osName = System.getProperty("os.name")
+    val prefix = if (osName.toLowerCase.contains("windows")) "_" else "."
+    val home = System.getProperty("user.home")
+
+    s"${home}/${prefix}netrc"
   }
 }

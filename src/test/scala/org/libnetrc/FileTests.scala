@@ -47,6 +47,12 @@ class FileTests extends FlatSpec with Matchers with BeforeAndAfter {
     ))
   }
 
+  it should "return non-empty path to .netrc" in {
+    val name = NetRcFile.name
+
+    name.contains("netrc") shouldBe true
+  }
+
   after {
     deleteNetRcFile()
   }
