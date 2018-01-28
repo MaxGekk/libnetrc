@@ -108,4 +108,26 @@ class ItemsTests extends FlatSpec with Matchers {
       Default("log", "pass")
     ))
   }
+
+  it should "find a machine by name" in {
+    val netrc = NetRc(Seq(
+      Machine("a", "b", "c"),
+      Machine("f", "g", "h"),
+      Default("x", "y")
+    ))
+    val machine = netrc.find(name = "a")
+
+    machine.get shouldBe Machine("a", "b", "c")
+  }
+
+  it should "find a machine by regex" in {
+    val netrc = NetRc(Seq(
+      Machine("a.b.com", "b", "c"),
+      Machine("cloud.b.com", "g", "h"),
+      Default("x", "y")
+    ))
+    val machine = netrc.find("""^a.*""".r)
+
+    machine.toList shouldBe List(Machine("a.b.com", "b", "c"))
+  }
 }

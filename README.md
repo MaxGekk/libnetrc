@@ -42,7 +42,7 @@ The upsert method looks for an item with the same name and update it if it exist
 The delete method finds all machine items with the matched names and deletes thems:
 
 ```
-netrc.delete(""".*\.cloud.com""")
+netrc.delete(""".*\.cloud.com""".r)
 ```
 
 To delete all default items:
@@ -54,7 +54,7 @@ netrc.deleteDefault()
 The find method scans all items and checks either item's name, login, password or account is matched to user's needs:
 
 ```
-val items: List[Items] = netrc.find(name = Some("*.com"), login = Some("user.name@gmail.com"))
+val items: Iterable[Items] = netrc.find("""^cloud.*\.com""".r)
 ```
 
 The updated instance of NetRc could be saved back to the .netrc file:

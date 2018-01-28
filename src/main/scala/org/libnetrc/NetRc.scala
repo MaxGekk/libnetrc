@@ -71,6 +71,14 @@ case class NetRc(items: Seq[Item]) {
     withoutDefaults.copy(items = withoutDefaults.items :+ default)
   }
 
+  def find(name: String): Option[Machine] = items.collect {
+      case m: Machine if m.name == name => m
+  }.headOption
+
+  def find(regex: Regex): Iterable[Machine] = items.collect {
+    case m: Machine if regex.findFirstIn(m.name).isDefined => m
+  }
+
   def save(file: String, append: Boolean = false): Unit = {
     val fw = new FileWriter(file)
     try {
