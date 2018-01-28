@@ -51,6 +51,20 @@ case class NetRc(items: Seq[Item]) {
     items.map(_.toString).mkString("\n")
   }
 
+  def upsert(machine: Machine): NetRc = {
+    val newItems = items.map {
+      case m:Machine if m.name == machine.name => machine
+      case item => item
+    }
+    val updated = this.copy(items = if (!newItems.exists(_ == machine)) {
+        items :+ machine
+      } else {
+        newItems
+      }
+    )
+    updated.withFixedDefaults
+  }
+
   def save(file: String, append: Boolean = false): Unit = {
     val fw = new FileWriter(file)
     try {
@@ -61,6 +75,13 @@ case class NetRc(items: Seq[Item]) {
   }
 
   def save(append: Boolean): Unit = save(NetRcFile.name, append)
+
+  def withFixedDefaults: NetRc = {
+    val firstDefault = items.collectFirst {case d: Default => d}
+    val withoutDefaults = deleteDefault
+
+    withoutDefaults.copy(items = withoutDefaults.items ++ firstDefault)
+  }
 }
 
 object NetRcFile {
