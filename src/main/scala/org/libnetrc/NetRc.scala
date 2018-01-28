@@ -1,7 +1,9 @@
 package org.libnetrc
 
 import java.io._
+
 import scala.io.Source
+import scala.util.matching.Regex
 import scala.util.parsing.input.Positional
 
 sealed trait Item extends Positional
@@ -31,6 +33,18 @@ case class MacDef(name: String, commands: String) extends Item {
 }
 
 case class NetRc(items: Seq[Item]) {
+  def deleteDefault: NetRc = {
+    this.copy(items = items.filter(!_.isInstanceOf[Default]))
+  }
+
+  def delete(name: String): NetRc = {
+    val regex = new Regex(name)
+    this.copy(items = items.filterNot {
+      case machine: Machine => regex.findFirstIn(machine.name).isDefined
+      case _ => false
+    })
+  }
+
   override def toString: String = {
     items.map(_.toString).mkString("\n")
   }

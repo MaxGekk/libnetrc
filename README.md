@@ -42,7 +42,7 @@ The upsert method looks for an item with the same name and update it if it exist
 The delete method finds all machine items with the matched names and deletes thems:
 
 ```
-netrc.delete("*.cloud.com")
+netrc.delete(""".*\.cloud.com""")
 ```
 
 To delete all default items:
