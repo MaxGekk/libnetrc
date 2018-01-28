@@ -37,13 +37,15 @@ case class NetRc(items: Seq[Item]) {
     this.copy(items = items.filter(!_.isInstanceOf[Default]))
   }
 
-  def delete(name: String): NetRc = {
-    val regex = new Regex(name)
+  def delete(f: Machine => Boolean): NetRc = {
     this.copy(items = items.filterNot {
-      case machine: Machine => regex.findFirstIn(machine.name).isDefined
+      case machine: Machine => f(machine)
       case _ => false
     })
   }
+
+  def delete(name: String): NetRc = delete(m => m.name == name)
+  def delete(regex: Regex): NetRc = delete(m => regex.findFirstIn(m.name).isDefined)
 
   override def toString: String = {
     items.map(_.toString).mkString("\n")

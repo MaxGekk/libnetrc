@@ -26,7 +26,7 @@ class ItemsTests extends FlatSpec with Matchers {
       Machine("host2.int.cloud.org", "g", "h"),
       Machine("localhost", "y", "z")
     ))
-    val newNetRc = netrc.delete(""".*\.org""")
+    val newNetRc = netrc.delete(""".*\.org""".r)
 
     newNetRc shouldBe NetRc(Seq(
       Machine("machine.databricks.com", "d", "e"),
