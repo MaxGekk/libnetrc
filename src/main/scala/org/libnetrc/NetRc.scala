@@ -65,6 +65,12 @@ case class NetRc(items: Seq[Item]) {
     updated.withFixedDefaults
   }
 
+  def upsert(default: Default): NetRc = {
+    val withoutDefaults = this.deleteDefault
+
+    withoutDefaults.copy(items = withoutDefaults.items :+ default)
+  }
+
   def save(file: String, append: Boolean = false): Unit = {
     val fw = new FileWriter(file)
     try {

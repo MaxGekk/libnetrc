@@ -93,4 +93,19 @@ class ItemsTests extends FlatSpec with Matchers {
       Default("x", "y")
     ))
   }
+
+  it should "upsert a default item" in {
+    val netrc = NetRc(Seq(
+      Machine("a", "b", "c"),
+      Machine("f", "g", "h"),
+      Default("x", "y")
+    ))
+    val newNetRc = netrc.upsert(Default("log", "pass"))
+
+    newNetRc shouldBe NetRc(Seq(
+      Machine("a", "b", "c"),
+      Machine("f", "g", "h"),
+      Default("log", "pass")
+    ))
+  }
 }
