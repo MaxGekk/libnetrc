@@ -69,7 +69,7 @@ case class NetRc(items: Seq[Item]) {
   def delete(regex: Regex): NetRc = delete(m => regex.findFirstIn(m.name).isDefined)
 
   /**
-    * Serialize a NetRc instance to a string. For example:
+    * Serializes a NetRc instance to a string. For example:
     * {{{
     *   NetRc(Seq(
     *     Machine(
@@ -91,6 +91,28 @@ case class NetRc(items: Seq[Item]) {
     items.map(_.toString).mkString("\n")
   }
 
+  /**
+    * Appends the machine item before any default items it the item doesn't exist in the NetRc
+    * or replace existing items with the same name as the given one has. For example:
+    * {{{
+    *   val netRc = NetRc(Seq(
+    *     Machine("host1", "username", "pass123"),
+    *     Default("anonymous", "123")
+    *   ))
+    *   netRc.upsert(Machine("host2", "user", "123")).toString
+    *     "machine host1 login username password pass123
+    *      machine host2 login user password 123
+    *      default login anonymous password 123"
+    *   netRc.upsert(Machine("host1", "root", "qwerty"))
+    *     "machine host1 login root password qwerty
+    *      machine host2 login user password 123
+    *      default login anonymous password 123"
+    * }}}
+    * Note: If the NetRc has multiple default items, only the first default item
+    * will be still presented in new NetRc instance after the upsert operation.
+    * @param machine - the machine item to append or replace existing one
+    * @return new instance of NetRc with appended/replaced by the given machine item.
+    */
   def upsert(machine: Machine): NetRc = {
     val newItems = items.map {
       case m:Machine if m.name == machine.name => machine
@@ -105,6 +127,22 @@ case class NetRc(items: Seq[Item]) {
     updated.withFixedDefaults
   }
 
+  /**
+    * Updates/appends a default item into a NetRc instance. For example, if a NetRc
+    * has wrong structure with multiple default items like:
+    * {{{
+    *   val netRc = NetRc(Seq(
+    *     Default(login = "anonymous", password = "123"),
+    *     Machine("host1", "user", "321"),
+    *     Default(login = "default_user", password = "qwerty")
+    *   ))
+    *   netRc.upsert(Default("anonymous", "Hello")).toString
+    *      "machine host1 login user password 321
+    *       default login anonymous password Hello"
+    * }}}
+    * @param default - the default item to append/replace
+    * @return new NetRc instance with the given default item
+    */
   def upsert(default: Default): NetRc = {
     val withoutDefaults = this.deleteDefault
 
