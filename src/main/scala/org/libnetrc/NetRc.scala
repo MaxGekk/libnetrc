@@ -3,6 +3,27 @@ package org.libnetrc
 import java.io._
 import scala.util.matching.Regex
 
+/**
+  * Structured representation of a .netrc file. For example, if the content of .netrc is:
+  * {{{
+  *   machine my-shard.cloud.databricks.com login user.name@gmail.com password jhdk2u192
+  *
+  *   machine localhost
+  *   login anonymous
+  *   password kjk3889
+  *
+  *   default login anonymous password 123 account 456
+  * }}}
+  * The file has the following representation:
+  * {{{
+  *   NetRc(Seq(
+  *     Machine("my-shard.cloud.databricks.com", "user.name@gmail.com", "jhdk2u192"),
+  *     Machine("localhost", "anonymous", "kjk3889"),
+  *     Default("anonymous", "123", Some("456"))
+  *   ))
+  * }}}
+  * @param items
+  */
 case class NetRc(items: Seq[Item]) {
   /**
     * Deletes all default items. For instance:
@@ -149,10 +170,46 @@ case class NetRc(items: Seq[Item]) {
     withoutDefaults.copy(items = withoutDefaults.items :+ default)
   }
 
+  /**
+    * Finds a machine item with the given name among items of NetRc. For example:
+    * {{{
+    *   val netRc = NetRc(Seq(
+    *     Machine("host1", "a", "b"),
+    *     Machine("host2", "c", "d")
+    *   ))
+    *   netRc.find("host2")
+    * }}}
+    * The find call should return the following:
+    * {{{
+    *   Some(Machine("host2", "c", "d"))
+    * }}}
+    * @param name - the name of searching machine item
+    * @return the first machine item with the given name or None otherwise
+    */
   def find(name: String): Option[Machine] = items.collect {
       case m: Machine if m.name == name => m
   }.headOption
 
+  /**
+    * Finds all machine items with names matched to the given regex. For example:
+    * {{{
+    *   val netRc = NetRc(Seq(
+    *     Machine("myshard.mycloud.com", "a", "b"),
+    *     Machine("notmyshard.cloud.com", "c", "d"),
+    *     Machine("myshard.cloud.databricks.com", "x", "y")
+    *   ))
+    *   netRc.find("""^myshard.*""".r).toList
+    * }}}
+    * The call should return the following result:
+    * {{{
+    *   List(
+    *     Machine("myshard.mycloud.com", "a", "b"),
+    *     Machine("myshard.cloud.databricks.com", "x", "y")
+    *   )
+    * }}}
+    * @param regex - regular java expression. See the [[java.util.regex]] package
+    * @return Collection of matched items
+    */
   def find(regex: Regex): Iterable[Machine] = items.collect {
     case m: Machine if regex.findFirstIn(m.name).isDefined => m
   }
