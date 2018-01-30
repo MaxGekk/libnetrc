@@ -4,7 +4,7 @@ import scala.util.parsing.combinator.{JavaTokenParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
 // Parser-combinators for the .netrc syntax
-trait Parsers extends RegexParsers with JavaTokenParsers {
+trait Parsers extends RegexParsers {
   def value = "" ~> // handle whitespace
     rep1(elem("name part", !Character.isSpace(_: Char))) ^^ (_.mkString)
 
