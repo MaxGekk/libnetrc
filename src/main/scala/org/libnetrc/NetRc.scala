@@ -214,6 +214,17 @@ case class NetRc(items: Seq[Item]) {
     case m: Machine if regex.findFirstIn(m.name).isDefined => m
   }
 
+  /**
+    * Serializes the NetRc instance and saves it to the given file.
+    * @param file - the system-dependent filename
+    * @param append - if it is true, textual representation of the NetRc will
+    *               be added to the end of the file otherwise the file will be
+    *               overwritten.
+    * @throws FileNotFoundException if the file exists but is a directory
+    *                               rather than a regular file, does not exist but cannot
+    *                               be created, or cannot be opened for any other reason
+    */
+  @throws(classOf[FileNotFoundException])
   def save(file: String, append: Boolean = false): Unit = {
     val fw = new FileWriter(file)
     try {
@@ -223,8 +234,35 @@ case class NetRc(items: Seq[Item]) {
     }
   }
 
+  /**
+    * Saves serialized NetRc to the netrc file by standard path
+    * @param append - if true, append to the end of the file otherwise overwrite it.
+    * @throws FileNotFoundException if the file exists but is a directory
+    *                               rather than a regular file, does not exist but cannot
+    *                               be created, or cannot be opened for any other reason
+    */
+  @throws(classOf[FileNotFoundException])
   def save(append: Boolean): Unit = save(NetRcFile.name, append)
 
+  /**
+    * Takes the first default item and moves it to the end of .netrc. For example:
+    * {{{
+    *   val netRc = NetRc(Seq(
+    *     Default("login1", "pass1"),
+    *     Machine("host2", "login2", "pass2"),
+    *     Default("login3", "pass3")
+    *   ))
+    *   netRc.withFixedDefaults
+    * }}}
+    * The former call should return the following:
+    * {{{
+    *   NetRc(Seq(
+    *     Machine("host2", "login2", "pass2"),
+    *     Default("login1", "pass1")
+    *   ))
+    * }}}
+    * @return updated instance of NetRc with one default at the end
+    */
   def withFixedDefaults: NetRc = {
     val firstDefault = items.collectFirst {case d: Default => d}
     val withoutDefaults = deleteDefault
