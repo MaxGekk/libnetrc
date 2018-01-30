@@ -5,10 +5,7 @@ import scala.io.Source
 object NetRcFile {
   def read(file: String): NetRc = {
     val str = Source.fromFile(file).mkString
-    Parsers.parse(str) match {
-      case Left(error) => throw error
-      case Right(netc) => netc
-    }
+    Parsers.parse(str)
   }
 
   def read: NetRc = read(name)

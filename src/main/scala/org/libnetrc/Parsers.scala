@@ -37,11 +37,10 @@ trait Parsers extends RegexParsers with JavaTokenParsers {
 }
 
 object Parsers extends Parsers {
-  def parse(s: CharSequence): Either[org.libnetrc.Error, NetRc] = {
+  def parse(s: CharSequence): NetRc = {
     parse(new CharSequenceReader(s)) match {
-      case Success(res, _) => Right(res)
-      case NoSuccess(msg, next) =>
-        Left(org.libnetrc.Error(pos = next.pos, msg))
+      case Success(res, _) => res
+      case NoSuccess(msg, next) => throw ParseError(pos = next.pos, msg)
     }
   }
   def parse(input: CharSequenceReader): ParseResult[NetRc] = parsePhrase(input)
