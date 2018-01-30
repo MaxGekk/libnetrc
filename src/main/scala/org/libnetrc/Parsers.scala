@@ -1,6 +1,6 @@
 package org.libnetrc
 
-import scala.util.parsing.combinator.{JavaTokenParsers, RegexParsers}
+import scala.util.parsing.combinator.RegexParsers
 import scala.util.parsing.input.CharSequenceReader
 
 // Parser-combinators for the .netrc syntax
