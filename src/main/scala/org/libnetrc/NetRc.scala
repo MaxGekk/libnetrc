@@ -225,7 +225,7 @@ case class NetRc(items: Seq[Item]) {
     *                               be created, or cannot be opened for any other reason
     */
   @throws(classOf[FileNotFoundException])
-  def save(file: String, append: Boolean = false): Unit = {
+  def save(file: String, append: Boolean): Unit = {
     val fw = new FileWriter(file)
     try {
       fw.write(toString)
@@ -242,7 +242,7 @@ case class NetRc(items: Seq[Item]) {
     *                               be created, or cannot be opened for any other reason
     */
   @throws(classOf[FileNotFoundException])
-  def save(append: Boolean): Unit = save(NetRcFile.name, append)
+  def save(append: Boolean = false): Unit = save(NetRcFile.name, append)
 
   /**
     * Takes the first default item and moves it to the end of .netrc. For example:

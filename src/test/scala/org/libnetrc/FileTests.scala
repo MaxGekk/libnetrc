@@ -23,7 +23,7 @@ class FileTests extends FlatSpec with Matchers with BeforeAndAfter {
       Default("w", "x")
     ))
 
-    netrc.save(tmpFile)
+    netrc.save(tmpFile, false)
 
     assert(new File(tmpFile).exists())
   }
